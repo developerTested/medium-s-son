@@ -1,0 +1,107 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["omitApi"]
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model blog {
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  user_id     String @db.ObjectId
+  description String
+  title       String
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  // Relationship
+  author user   @relation(fields: [user_id], references: [id])
+  posts  post[]
+}
+
+model like {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  user_id    String   @db.ObjectId
+  post_id    String?  @db.ObjectId
+  comment_id String?  @db.ObjectId
+  type       LikeType @default(POST)
+  post       post?    @relation(fields: [post_id], references: [id])
+  user       user?    @relation(fields: [user_id], references: [id])
+  comment    comment? @relation(fields: [comment_id], references: [id])
+}
+
+model comment {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  user_id String @db.ObjectId
+  post_id String @db.ObjectId
+  content String
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  author user   @relation(fields: [user_id], references: [id])
+  post   post   @relation(fields: [post_id], references: [id])
+  likes  like[]
+}
+
+model post {
+  id            String  @id @default(auto()) @map("_id") @db.ObjectId
+  user_id       String  @db.ObjectId
+  blog_id       String? @db.ObjectId
+  content       String
+  featuredImage String?
+  slug          String
+  title         String
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  author   user      @relation(fields: [user_id], references: [id])
+  likes    like[]
+  comments comment[]
+  blog     blog?     @relation(fields: [blog_id], references: [id])
+}
+
+model social_accounts {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  user_id   String @db.ObjectId
+  email     String
+  social_id String
+  provider  String
+
+  user user @relation(fields: [user_id], references: [id])
+}
+
+model user {
+  id           String  @id @default(auto()) @map("_id") @db.ObjectId
+  display_name String
+  user_name    String  @unique(map: "user_name_1")
+  email        String  @unique(map: "email_1")
+  avatar       String?
+  password     String
+  refreshToken String?
+  role         Role    @default(USER)
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  // Relationship
+  blogs    blog[]
+  posts    post[]
+  comments comment[]
+  likes    like[]
+  social   social_accounts[]
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum LikeType {
+  POST
+  COMMENT
+}
