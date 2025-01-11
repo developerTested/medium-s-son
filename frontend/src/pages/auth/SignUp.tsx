@@ -1,4 +1,5 @@
 import Button from '@/components/forms/Button'
+import GoogleLoginButton from '@/components/forms/GoogleLoginButton'
 import Input from '@/components/forms/Input'
 import Logo from '@/components/Logo'
 import { registerBody, RegisterSchema } from '@/schema/authSchema'
@@ -26,16 +27,24 @@ export default function SignUp() {
     const onSubmit = (data: registerBody) => console.log(data)
 
     return (
-        <div className="p-2 w-full max-w-xl rounded-md flex flex-col gap-4">
+        <div className="p-2 w-full max-w-xl rounded-md space-y-4 gap-4">
             <Link to={"/"} className="block text-center mb-4">
                 <Logo className="text-4xl" />
             </Link>
 
             <h1 className="text-4xl font-semibold text-center">Create an account to start writing.</h1>
 
+            <GoogleLoginButton text="signup_with" />
+            
+            <div className="flex items-center">
+                <div className="flex-1 border-t border-gray-300"></div>
+                <p className="mx-2 text-gray-500">OR</p>
+                <div className="flex-1 border-t border-gray-300"></div>
+            </div>
+
             <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
                 <div className="flex items-center gap-4">
-                    <div className="space-y-2">
+                    <div className="space-y-2 flex-1">
                         <label htmlFor="user_name" className="block text-sm">User Name</label>
                         <Input
                             type="text"
@@ -46,7 +55,7 @@ export default function SignUp() {
 
                         {errors.user_name ? <p className='text-red-500 text-sm'>{errors.user_name?.message}</p> : undefined}
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-2 flex-1">
                         <label htmlFor="display_name" className="block text-sm">Display Name</label>
                         <Input
                             type="text"

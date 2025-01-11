@@ -12,10 +12,7 @@ import { useAppDispatch } from '@/hooks'
 import { login } from '@/redux/slices/actions/auth'
 import { toast } from 'react-toastify'
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import { GoogleLogin } from '@react-oauth/google';
-import { decodeJwtResponse } from '@/utilities/helper'
-import { setSocialUser } from '@/redux/slices/authSlice'
-import MediumAPI from '@/utilities/api'
+import GoogleLoginButton from '@/components/forms/GoogleLoginButton'
 
 export default function SignIn() {
 
@@ -59,41 +56,6 @@ export default function SignIn() {
         }
     }
 
-
-    const handleSocialLogin = async (credentialResponse?: string) => {
-
-        if (!credentialResponse) {
-            toast.error("Login failed")
-
-            return false;
-        }
-
-        const decodeToken = decodeJwtResponse(credentialResponse);
-
-        const socialUser = {
-            email: decodeToken.email,
-            display_name: `${decodeToken.given_name} ${decodeToken.family_name}`,
-            avatar: decodeToken.picture,
-            social_id: decodeToken.sub,
-            social_provider: "google",
-        }
-
-        try {
-
-            const registerData = {
-                ...socialUser,
-                user_name: socialUser.display_name.toLowerCase().replace(/ /g, '_')
-            }
-
-            const { data: response } = await MediumAPI.post("/user/social", registerData)
-
-            dispatch(setSocialUser(response))
-        } catch (error) {
-            toast.error("Error while Logging user")
-        }
-
-    }
-
     return (
         <div className="p-2 w-full max-w-xl rounded-md flex flex-col gap-4">
             <Link to={"/"} className="block text-center mb-4">
@@ -107,12 +69,7 @@ export default function SignIn() {
             </Alert> : undefined}
 
 
-            <GoogleLogin
-                onSuccess={credentialResponse => handleSocialLogin(credentialResponse.credential)}
-                onError={() => toast.error("Login Failed!")}
-                size="large"
-                width={"100%"}
-            />
+            <GoogleLoginButton />
 
             <div className="flex items-center">
                 <div className="flex-1 border-t border-gray-300"></div>
