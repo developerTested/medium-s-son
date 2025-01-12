@@ -3,6 +3,8 @@ import Button from '@/components/forms/Button'
 import GoogleLoginButton from '@/components/forms/GoogleLoginButton'
 import Input from '@/components/forms/Input'
 import Logo from '@/components/Logo'
+import Alert from '@/components/Alert'
+import Spinner from '@/components/Spinner'
 import { registerBody, RegisterSchema } from '@/schema/authSchema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -11,7 +13,6 @@ import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { toast } from 'react-toastify'
 import { useAppDispatch } from '@/hooks'
 import { signUp } from '@/redux/slices/actions/auth'
-import Alert from '@/components/Alert'
 
 export default function SignUp() {
 
@@ -77,11 +78,12 @@ export default function SignUp() {
                 {error}
             </Alert> : undefined}
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 relative p-4 bg-white rounded-xl shadow-lg">
+            <form aria-disabled={loading} onSubmit={handleSubmit(onSubmit)} className="space-y-4 relative p-4 bg-white rounded-xl shadow-lg">
                 <div className="flex gap-4">
                     <div className="space-y-2 flex-1">
                         <label htmlFor="user_name" className="block text-sm">User Name</label>
                         <Input
+                            disabled={loading}
                             type="text"
                             placeholder="User Name"
                             id="user_name"
@@ -93,6 +95,7 @@ export default function SignUp() {
                     <div className="space-y-2 flex-1">
                         <label htmlFor="display_name" className="block text-sm">Display Name</label>
                         <Input
+                            disabled={loading}
                             type="text"
                             placeholder="Display Name"
                             id="display_name"
@@ -138,8 +141,8 @@ export default function SignUp() {
                     </p> : ''}
                 </div>
 
-                <Button type="submit" fullWidth>
-                    Sign up
+                <Button size="lg" disabled={loading} fullWidth>
+                    {loading ? <Spinner /> : 'Sign up'}
                 </Button>
             </form>
 
