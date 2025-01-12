@@ -40,7 +40,7 @@ export default function PostCreate() {
    */
   const fetchBlogs = async () => {
     try {
-      const { data: response } = await MediumAPI.get("/blogs");
+      const { data: response } = await MediumAPI.get("/blogs/users");
 
       setBlogs(response.data);
     } catch (error: any) {
@@ -57,9 +57,8 @@ export default function PostCreate() {
 
     setError(null);
 
-    if (!selectedBlog) {
-      toast.error("Please select a Blog to continue")
-      setError("Please select a Blog to continue");
+    if (!textareaContent) {
+      setError("Post content is required!")
       return false;
     }
 
