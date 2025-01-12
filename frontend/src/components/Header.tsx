@@ -12,7 +12,7 @@ export default function Header() {
     const { user, loggedIn } = useAppSelector(state => state.auth)
 
     return (
-        <header className="flex items-center justify-between w-full h-14 bg-white shadow px-4">
+        <header className="sticky top-0 z-1030 flex items-center justify-between w-full h-14 bg-white shadow px-4">
             <div className="flex items-center gap-4">
                 <Link to="/">
                     <Logo />
