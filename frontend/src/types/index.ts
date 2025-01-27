@@ -53,7 +53,7 @@ export type CreatePostType = {
     content: string,
     published: boolean,
     status: string,
-    images: any,
+    featuredImage?: string,
 }
 
 export type PostType = {

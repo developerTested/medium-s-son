@@ -2,12 +2,16 @@ import { PostType } from "@/types";
 import { formatDate } from "@/utilities/helper";
 import { Link } from "react-router-dom";
 import Avatar from "../Avatar";
+import { useAppSelector } from "@/hooks";
+import { FaEdit } from "react-icons/fa";
 
 type PostItemCardProps = {
   post?: PostType
 }
 
 export default function PostItemCard({ post }: PostItemCardProps) {
+
+  const { user } = useAppSelector((state) => state.auth);
 
   if (!post?.id) {
     return <article className="p-2 animate-pulse bg-white rounded">
@@ -27,7 +31,7 @@ export default function PostItemCard({ post }: PostItemCardProps) {
 
   return (
     <article className="flex gap-6 p-2 cursor-pointer bg-white hover:bg-slate-100 rounded shadow">
-      <Link to={`/${post.author.user_name}/${post.slug}`} className="flex-1">
+      <div className="flex-1">
         <div className="flex items-center gap-2 mb-2">
           <Avatar
             src={`https://api.dicebear.com/7.x/initials/svg?seed=${post.author.display_name}`}
@@ -38,11 +42,22 @@ export default function PostItemCard({ post }: PostItemCardProps) {
             <span className="font-semibold display-name">{post.author.display_name}</span>
             <span className="w-1 h-1 rounded-full bg-gray-500"></span>
             <span className="text-gray-500 posted-on">{formatDate(post.createdAt)}</span>
+
+            {user && user.user_name === post.author.user_name  ?
+              <Link
+                to={`/posts/${post.id}/edit`}
+                className="text-gray-500 posted-on">
+                <FaEdit />
+              </Link>
+              : ""
+            }
           </div>
         </div>
-        <h2 className="text-xl font-bold mb-2 font-serif post-title">{post.title}</h2>
+        <Link to={`/${post.author.user_name}/${post.slug}`}>
+          <h2 className="text-xl font-bold mb-2 font-serif post-title">{post.title}</h2>
+        </Link>
         <p className="text-gray-600 mb-4 line-clamp-2 post-content">{post.content}</p>
-      </Link>
+      </div>
       {post.featuredImage && (
         <div className="w-48 h-32 hidden md:block">
           <img

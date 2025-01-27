@@ -34,7 +34,7 @@ export default function Alert({ children, border, title, outlined, variant = "de
 
     return (
         <div className={alertClass}>
-            {title ? <div className="alert-title">{title}</div> : undefined}
+            {title ? <div className="alert-title text-4xl">{title}</div> : undefined}
 
             <div className="alert-body flex items-center justify-between">
                 {icon ? <div className="alert-icon">

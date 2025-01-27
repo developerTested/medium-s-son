@@ -42,7 +42,7 @@ export default function PostList() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-8 my-4">
                 {posts.length > 0 ?
-                    posts.map((post: PostType) => <PostItemCard post={post} />)
+                    posts.map((post: PostType) => <PostItemCard key={post.id} post={post} />)
                     : <div className="text-4xl font-bold">No Posts found!</div>}
             </div>
         </div>

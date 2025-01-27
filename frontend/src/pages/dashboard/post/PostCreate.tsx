@@ -9,6 +9,7 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import { FaChevronDown } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import useFilePreview from '@/hooks/useFilePreview';
 
 export default function PostCreate() {
 
@@ -35,6 +36,11 @@ export default function PostCreate() {
     },
   })
 
+  const tempFile = watch(["featuredImage"]);
+
+  const [filePreview] = useFilePreview(tempFile[0]);
+
+
   /**
    * Fetch Blog List by User
    */
@@ -55,8 +61,6 @@ export default function PostCreate() {
    */
   const createPost: SubmitHandler<CreatePostType> = async (data) => {
 
-    setError(null);
-
     if (!textareaContent) {
       setError("Post content is required!")
       return false;
@@ -66,9 +70,17 @@ export default function PostCreate() {
       data.content = textareaContent;
     }
 
+    if (data.featuredImage) {
+      data.featuredImage = data.featuredImage[0]
+    }
+
     try {
 
-      const { data: response } = await MediumAPI.post(`/posts`, data);
+      const { data: response } = await MediumAPI.post(`/posts`, data, {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      });
 
       toast.success(response?.message)
 
@@ -80,6 +92,7 @@ export default function PostCreate() {
       toast.error(error?.message)
     }
   }
+
 
   /**
    * Get Editor Content
@@ -131,66 +144,99 @@ export default function PostCreate() {
       <h2 className="block text-center text-4xl font-semibold mb-4">Create a new Post</h2>
 
       <form encType="multipart/form-data" onSubmit={handleSubmit(createPost)} className="block space-y-4 w-full p-4 border shadow-md rounded-md">
-        {
-          error ?
-            <Alert variant="danger">
-              {error}
-            </Alert> :
-            undefined
-        }
+
+        <div className="flex justify-between gap-4">
+          <div className="post-form w-full grow">
+            {
+              error ?
+                <Alert variant="danger">
+                  {error}
+                </Alert> :
+                undefined
+            }
 
 
-        <div className="space-y-2">
-          <label htmlFor="title" className="font-semibold">Select Blog:</label>
+            <div className="space-y-2">
+              <label htmlFor="title" className="font-semibold">Select Blog:</label>
 
-          <div className="relative w-full flex items-center justify-between rounded bg-slate-100">
-            <select
-              className="block w-full px-4 py-2 appearance-none rounded"
-              {...register("blog_id", {
-                required: true,
-              })}
-              defaultValue={selectedBlog}
-              onChange={(e) => setSelectedBlog(e.target.value)}
-            >
-              <option value={0}>Select a Blog</option>
+              <div className="relative w-full flex items-center justify-between rounded bg-slate-100">
+                <select
+                  className="block w-full px-4 py-2 appearance-none rounded"
+                  {...register("blog_id", {
+                    required: true,
+                  })}
+                  defaultValue={selectedBlog}
+                  onChange={(e) => setSelectedBlog(e.target.value)}
+                >
+                  <option value={0}>Select a Blog</option>
 
-              {blogs.length > 0 ? blogs.map((blog) => <option key={blog.id} value={blog.id}>{blog.title}</option>) : undefined}
-            </select>
-            <div className="absolute right-4 top-auto bottom-auto">
-              <FaChevronDown />
+                  {blogs.length > 0 ? blogs.map((blog) => <option key={blog.id} value={blog.id}>{blog.title}</option>) : undefined}
+                </select>
+                <div className="absolute right-4 top-auto bottom-auto">
+                  <FaChevronDown />
+                </div>
+              </div>
+              {errors.blog_id ? <p className="text-sm text-red-500">{errors.blog_id.message}</p> : undefined}
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor="title" className="font-semibold">Title:</label>
+              <Input
+                placeholder="Title"
+                className="mb-4"
+                {...register("title")}
+              />
+              {errors.title ? <p className="text-sm text-red-500">{errors.title.message}</p> : undefined}
+            </div>
+            <div className="space-y-2">
+              <label htmlFor="description" className="font-semibold">Slug:</label>
+              <Input
+                placeholder="Slug"
+                className="mb-4"
+                {...register("slug")}
+              />
+            </div>
+            <div className="space-y-2">
+              <label htmlFor="description" className="font-semibold">Description:</label>
+
+              <PostEditor handleEditorChange={handleEditorChange} />
+
+              {errors.content ? <p className="text-sm text-red-500">{errors.content.message}</p> : undefined}
             </div>
           </div>
-          {errors.blog_id ? <p className="text-sm text-red-500">{errors.blog_id.message}</p> : undefined}
-        </div>
 
-        <div className="space-y-2">
-          <label htmlFor="title" className="font-semibold">Title:</label>
-          <Input
-            placeholder="Title"
-            className="mb-4"
-            {...register("title")}
-          />
-          {errors.title ? <p className="text-sm text-red-500">{errors.title.message}</p> : undefined}
-        </div>
-        <div className="space-y-2">
-          <label htmlFor="description" className="font-semibold">Slug:</label>
-          <Input
-            placeholder="Slug"
-            className="mb-4"
-            {...register("slug")}
-          />
-        </div>
-        <div className="space-y-2">
-          <label htmlFor="description" className="font-semibold">Description:</label>
+          <div className="w-80 space-y-4">
+            <div className="space-y-2">
+              <label htmlFor="featuredImage" className="font-semibold">Featured Image:</label>
 
-          <PostEditor handleEditorChange={handleEditorChange} />
+              <Input
+                type="file"
+                placeholder="Featured Image"
+                accept="image/*"
+                className="mb-4"
+                {...register("featuredImage")}
+              />
 
-          {errors.content ? <p className="text-sm text-red-500">{errors.content.message}</p> : undefined}
-        </div>
-        <div className="flex items-center justify-between">
-          <Button type="submit">Create Post</Button>
+              {filePreview ? <img src={filePreview} /> : ""}
 
-          <Button variant="secondary" type="reset">Reset</Button>
+              {errors.featuredImage ? <p className="text-sm text-red-500">{errors.featuredImage.message}</p> : undefined}
+            </div>
+            <div className="flex items-center justify-between gap-4">
+              <label htmlFor="status" className="font-semibold">Status</label>
+
+              <select
+                id="status"
+                className="px-4 py-2 appearance-none"
+                {...register("status")}
+              >
+                <option value={"DRAFT"} disabled>DRAFT</option>
+                <option value={"PUBLISH"}>PUBLISH</option>
+              </select>
+            </div>
+            <div className="flex items-center justify-between">
+              <Button type="submit">Create Post</Button>
+            </div>
+          </div>
         </div>
       </form>
     </div>
