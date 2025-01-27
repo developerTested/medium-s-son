@@ -4,24 +4,41 @@ import Button from "@/components/forms/Button";
 import Input from "@/components/forms/Input";
 import Logo from "@/components/Logo";
 import { useForm, SubmitHandler } from "react-hook-form";
+import MediumAPI from "@/utilities/api";
+import Spinner from "@/components/Spinner";
 
 interface IFormInput {
     email: string;
 }
 
 export default function ForgotPassword() {
+
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState(false);
+
     const {
         register,
         handleSubmit,
         formState: { errors },
     } = useForm<IFormInput>();
 
-    const onSubmit: SubmitHandler<IFormInput> = (data) => {
-        console.log("Password reset email sent to:", data.email);
-    };
+    const onSubmit: SubmitHandler<IFormInput> = async (data) => {
+        setLoading(true);
+        setError("");
+        setSuccess(false);
+        try {
+            await MediumAPI.post("/user/password/forgot", {
+                email: data.email
+            });
 
-    const [error, setError] = useState("");
-    const [success, setSuccess] = useState(false);
+            setSuccess(true);
+        } catch (error: any) {
+            setError(error.message)
+        }
+
+        setLoading(false);
+    };
 
     return (
         <div className="max-w-lg w-full space-y-8 bg-white p-4 rounded-xl shadow-lg">
@@ -37,7 +54,7 @@ export default function ForgotPassword() {
                 </p>
             </div>
 
-        
+            {success ?
                 <div
                     className="bg-success text-white border border-green-400  px-4 py-3 rounded relative"
                     role="alert"
@@ -45,8 +62,8 @@ export default function ForgotPassword() {
                     <p className="text-sm text-center">
                         If this email is registered, you will receive a recovery link shortly.
                     </p>
-                </div>
-            
+                </div> : undefined}
+
             <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
                 <div className="rounded-md shadow-sm -space-y-px">
                     <div className="relative">
@@ -68,8 +85,8 @@ export default function ForgotPassword() {
                             })}
                         />
                         {errors.email ? <p className='text-red-600 text-xs my-1'>
-                        {errors.email.message}
-                    </p> : ''}
+                            {errors.email.message}
+                        </p> : ''}
                     </div>
                 </div>
 
@@ -79,12 +96,10 @@ export default function ForgotPassword() {
                     </div>
                 )}
 
-                <Button
-                    type="submit"
-                    fullWidth
-                >
-                    Send Recovery Link
+                <Button size="lg" disabled={loading} fullWidth>
+                    {loading ? <Spinner /> : "Send Recovery Link"}
                 </Button>
+
             </form>
             <p className="block text-center">
                 Go back to login <Link to={"/auth/login"} className="font-bold">Sign in</Link>
