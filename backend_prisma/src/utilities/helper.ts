@@ -19,6 +19,8 @@ dotenv.config();
 export const appConfig = {
     debug: process.env.APP_DEBUG === 'true' || false,
 
+    FRONTEND_URL: process.env.FRONTEND_URL || "http://localhost:5173",
+
     // Access Token
     ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET || "",
     ACCESS_TOKEN_EXPIRY: process.env.ACCESS_TOKEN_EXPIRY || "",
@@ -33,7 +35,11 @@ export const appConfig = {
     CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
 
     // MongoDB Database
-    MONGODB_URL: process.env.MONGODB_URL
+    MONGODB_URL: process.env.MONGODB_URL,
+
+    // Email
+    EMAIL_FROM: process.env.EMAIL_FROM || "",
+    RESEND_API: process.env.RESEND_API || "",
 }
 
 /**

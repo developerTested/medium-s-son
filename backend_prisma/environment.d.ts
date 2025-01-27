@@ -14,7 +14,10 @@ declare global {
             CLOUDINARY_CLOUD_NAME: string;
             CLOUDINARY_API_KEY: string;
             CLOUDINARY_API_SECRET: string;
-            MONGODB_URL: string,
+            MONGODB_URL: string;
+            EMAIL_FROM: string;
+            RESEND_API: string;
+            FRONTEND_URL: string;
         }
     }
 }

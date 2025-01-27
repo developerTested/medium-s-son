@@ -75,6 +75,17 @@ model social_accounts {
   user user @relation(fields: [user_id], references: [id])
 }
 
+model password_resets {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  user_id   String    @db.ObjectId
+  token     String
+  expireAt  DateTime
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  @@index([expireAt])
+}
+
 model user {
   id           String  @id @default(auto()) @map("_id") @db.ObjectId
   display_name String
